@@ -215,6 +215,27 @@
   .result .big{font-family:var(--font-display);font-size:2.4rem;color:var(--cream);} 
   .result p{color:var(--cream-dim);margin:6px 0 22px;}
 
+.quiz-category-box{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin:20px 0;
+    text-align:left;
+}
+
+.quiz-category-box label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    color:var(--cream);
+    font-family:var(--font-body);
+}
+
+.quiz-category-box input{
+    accent-color:var(--brass);
+}
+  
   @media (max-width:520px){
     .modal{padding:22px 18px 20px;}
     .quiz-card{padding:20px 18px;}
@@ -1423,8 +1444,7 @@ if(!quiz){
 
   return;
 }
-    return;
-  }
+
   if(quiz.idx >= quiz.questions.length){
     const pct = Math.round((quiz.score/quiz.questions.length)*100);
     wrap.innerHTML = `
@@ -1475,26 +1495,6 @@ if(!quiz){
   });
 }
 
-.quiz-category-box{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
-    margin:20px 0;
-    text-align:left;
-}
-
-.quiz-category-box label{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    cursor:pointer;
-    color:var(--cream);
-    font-family:var(--font-body);
-}
-
-.quiz-category-box input{
-    accent-color:var(--brass);
-}
   
 /* ---------------- mode & events ---------------- */
 function setMode(mode){
