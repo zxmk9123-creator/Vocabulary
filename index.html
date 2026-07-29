@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유지Trading 용어 매뉴얼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F2A2C;
+    --bg-alt:#153735;
+    --paper:#F4EEDE;
+    --paper-line:#E2D8BE;
+    --ink:#1C2A24;
+    --ink-soft:#5A6960;
+    --cream:#ECE4D2;
+    --cream-dim:#B9C4B9;
+    --brass:#C08A3E;
+    --rust:#B4552F;
+    --teal:#3C7A6B;
+    --olive:#8A8F3C;
+    --danger:#C1543C;
+    --font-display:'Oswald',sans-serif;
+    --font-body:'Lora',serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(192,138,62,0.07), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(60,122,107,0.10), transparent 50%);
+    color:var(--cream);
+    font-family:var(--font-body);
+    min-height:100vh;
+  }
+  .app{max-width:1080px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* ---------- header ---------- */
+  header.topbar{margin-bottom:22px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:.7rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(1.6rem,4vw,2.3rem);
+    letter-spacing:.01em;
+    margin:0 0 4px;
+    color:var(--cream);
+  }
+  .subhead{
+    font-size:.92rem;
+    color:var(--cream-dim);
+    margin:0 0 20px;
+    font-style:italic;
+  }
+
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+  .search-wrap{
+    position:relative;flex:1 1 260px;min-width:200px;
+  }
+  .search-wrap input{
+    width:100%;
+    background:var(--bg-alt);
+    border:1px solid rgba(236,228,210,0.18);
+    color:var(--cream);
+    font-family:var(--font-mono);
+    font-size:.88rem;
+    padding:11px 14px 11px 34px;
+    border-radius:3px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .search-wrap input::placeholder{color:var(--cream-dim);} 
+  .search-wrap input:focus{border-color:var(--brass);}
+  .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.6;}
+
+  .mode-toggle{display:flex;border:1px solid rgba(236,228,210,0.18);border-radius:3px;overflow:hidden;}
+  .mode-toggle button{
+    font-family:var(--font-display);
+    font-size:.8rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:10px 16px;
+    background:transparent;
+    color:var(--cream-dim);
+    border:none;
+    cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .mode-toggle button.active{background:var(--brass);color:#1C1204;}
+  .mode-toggle button:not(.active):hover{color:var(--cream);}
+
+  /* ---------- category rail ---------- */
+  .rail{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .chip{
+    font-family:var(--font-display);
+    font-size:.76rem;
+    letter-spacing:.03em;
+    padding:7px 13px 7px 11px;
+    border-radius:2px;
+    border:1px solid transparent;
+    background:var(--bg-alt);
+    color:var(--cream-dim);
+    cursor:pointer;
+    display:flex;align-items:center;gap:6px;
+    transition:all .15s;
+  }
+  .chip .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .chip.active{background:rgba(236,228,210,0.08);color:var(--cream);border-color:currentColor;}
+  .chip:hover{color:var(--cream);} 
+  .chip .count{font-family:var(--font-mono);opacity:.55;font-size:.7rem;}
+
+  /* ---------- term grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .card-wrap{filter:drop-shadow(0 3px 8px rgba(0,0,0,.35));cursor:pointer;}
+  .card{
+    background:var(--paper);
+    clip-path:polygon(16px 0,100% 0,100% 100%,16px 100%,0 50%);
+    padding:14px 16px 14px 32px;
+    position:relative;
+    min-height:108px;
+    display:flex;flex-direction:column;justify-content:center;
+    transition:transform .12s;
+  }
+  .card-wrap:hover .card{transform:translateX(2px);}
+  .card::before{
+    content:'';position:absolute;left:9px;top:50%;transform:translateY(-50%);
+    width:7px;height:7px;border-radius:50%;
+    background:var(--bg);
+    border:1.5px solid var(--cat-color,var(--brass));
+  }
+  .card .code{
+    font-family:var(--font-mono);font-size:.7rem;font-weight:700;
+    color:var(--cat-color,var(--brass));letter-spacing:.03em;
+    text-transform:uppercase;margin-bottom:3px;
+  }
+  .card .name{
+    font-family:var(--font-display);font-weight:500;font-size:1.02rem;
+    color:var(--ink);line-height:1.25;margin-bottom:6px;
+  }
+  .card .preview{
+    font-size:.8rem;color:var(--ink-soft);line-height:1.4;
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  }
+  .empty{padding:40px 10px;text-align:center;color:var(--cream-dim);font-style:italic;}
+
+  /* ---------- modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(6,16,15,0.72);
+    display:none;align-items:flex-start;justify-content:center;
+    padding:8vh 16px 16px;z-index:50;overflow-y:auto;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--paper);color:var(--ink);
+    max-width:560px;width:100%;border-radius:4px;
+    padding:26px 28px 24px;position:relative;
+    border-top:5px solid var(--cat-color,var(--brass));
+  }
+  .modal .close{
+    position:absolute;top:14px;right:14px;
+    background:none;border:none;font-family:var(--font-mono);
+    font-size:1rem;color:var(--ink-soft);cursor:pointer;
+    width:28px;height:28px;
+  }
+  .modal .code{font-family:var(--font-mono);font-size:.75rem;font-weight:700;color:var(--cat-color,var(--brass));text-transform:uppercase;letter-spacing:.04em;}
+  .modal h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:4px 0 14px;color:var(--ink);} 
+  .modal .def{font-size:1rem;line-height:1.65;margin:0 0 18px;}
+  .modal .rel-label{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;}
+  .rel-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .rel-chip{
+    font-family:var(--font-mono);font-size:.75rem;
+    padding:5px 10px;border-radius:2px;
+    background:rgba(28,42,36,0.06);border:1px solid rgba(28,42,36,0.15);
+    color:var(--ink);cursor:pointer;
+  }
+  .rel-chip:hover{background:rgba(28,42,36,0.12);}
+
+  /* ---------- quiz ---------- */
+  .quiz-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0;}
+  .gauge{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--brass) calc(var(--pct,0)*3.6deg),rgba(236,228,210,0.15) 0);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+  .gauge span{width:48px;height:48px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.72rem;color:var(--cream);} 
+  .quiz-card{background:var(--paper);color:var(--ink);border-radius:4px;padding:26px 28px;max-width:520px;width:100%;border-top:5px solid var(--brass);}
+  .quiz-card .qcode{font-family:var(--font-mono);font-size:.72rem;color:var(--brass);letter-spacing:.05em;text-transform:uppercase;}
+  .quiz-card h3{font-family:var(--font-display);font-size:1.3rem;font-weight:600;margin:4px 0 16px;}
+  .quiz-card .prompt{font-size:.85rem;color:var(--ink-soft);margin-bottom:14px;font-style:italic;}
+  .choice{
+    display:block;width:100%;text-align:left;
+    background:#fff;border:1px solid var(--paper-line);
+    padding:11px 14px;margin-bottom:8px;border-radius:3px;
+    font-family:var(--font-body);font-size:.9rem;line-height:1.4;
+    cursor:pointer;color:var(--ink);
+  }
+  .choice:hover:not(.locked){border-color:var(--brass);} 
+  .choice.correct{background:rgba(60,122,107,0.15);border-color:var(--teal);} 
+  .choice.wrong{background:rgba(193,84,60,0.14);border-color:var(--danger);} 
+  .quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;}
+  .quiz-footer .score{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft);} 
+  .btn{
+    font-family:var(--font-display);font-size:.82rem;letter-spacing:.03em;text-transform:uppercase;
+    background:var(--brass);color:#1C1204;border:none;padding:9px 18px;border-radius:3px;cursor:pointer;
+  }
+  .btn:disabled{opacity:.35;cursor:default;}
+  .btn.ghost{background:transparent;color:var(--cream);border:1px solid rgba(236,228,210,0.3);} 
+  .result{text-align:center;padding:30px 10px;} 
+  .result .big{font-family:var(--font-display);font-size:2.4rem;color:var(--cream);} 
+  .result p{color:var(--cream-dim);margin:6px 0 22px;}
+
+  @media (max-width:520px){
+    .modal{padding:22px 18px 20px;}
+    .quiz-card{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <p class="eyebrow">유지Trading Operations · Ex Tank / SAF·UCO / Palm Oil</p>
+    <h1>용어 매뉴얼</h1>
+    <p class="subhead">현장에서 바로 찾아 쓰는 무역·오퍼레이션 용어집</p>
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ECE4D2" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="용어 검색 (예: FOB, 레이타임, ISCC...)">
+      </div>
+      <div class="mode-toggle">
+        <button id="modeDict" class="active">사전 모드</button>
+        <button id="modeQuiz">퀴즈 모드</button>
+      </div>
+    </div>
+    <div class="rail" id="rail"></div>
+  </header>
+
+  <main id="dictView">
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <main id="quizView" style="display:none;">
+    <div class="quiz-wrap" id="quizWrap"></div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const CATS = {
+  incoterms:{label:'인코텀즈·결제', color:'#C08A3E', icon:'⚓'},
+  ops:{label:'오퍼레이션·물류', color:'#B4552F', icon:'🛢️'},
+  cert:{label:'인증·규제 (SAF/UCO)', color:'#3C7A6B', icon:'♻️'},
+  commodity:{label:'상품·원료', color:'#8A8F3C', icon:'🌴'}
+};
+
+const TERMS = [
+  {id:'fob', code:'FOB', name:'FOB (Free On Board)', cat:'incoterms', def:'수출항 본선 갑판에 화물을 적재하는 시점까지 매도인이 비용과 위험을 부담하는 인도조건. 이후 운임·보험은 매수인 책임.', related:['cif','cfr','bl']},
+  {id:'cif', code:'CIF', name:'CIF (Cost, Insurance and Freight)', cat:'incoterms', def:'매도인이 목적항까지의 운임과 보험료를 포함해 부담하는 조건. 위험은 선적 시점에 이전되지만 비용은 도착항까지 매도인이 커버.', related:['fob','cfr']},
+  {id:'cfr', code:'CFR', name:'CFR (Cost and Freight)', cat:'incoterms', def:'매도인이 목적항까지의 운임만 부담하고 보험은 매수인이 별도 가입하는 조건. CIF에서 보험료만 뺀 구조.', related:['fob','cif']},
+  {id:'lc', code:'L/C', name:'L/C (Letter of Credit, 신용장)', cat:'incoterms', def:'은행이 매도인에게 대금 지급을 보증하는 서류. 매수인 거래은행이 서류 조건 충족 시 지급을 확약함.', related:['tt','bl','cad']},
+  {id:'tt', code:'T/T', name:'T/T (Telegraphic Transfer, 전신송금)', cat:'incoterms', def:'은행 간 전신으로 대금을 직접 송금하는 결제방식. L/C보다 절차가 간단하지만 신용 리스크는 거래당사자가 직접 부담.', related:['lc','cad']},
+  {id:'bl', code:'B/L', name:'B/L (Bill of Lading, 선하증권)', cat:'incoterms', def:'선사가 화물 수령을 증명하고 운송계약 및 권리증권 역할을 하는 서류. 원본 제시로 화물 인수 권리가 이전됨.', related:['fob','lc','discharge']},
+  {id:'cad', code:'CAD', name:'CAD (Cash Against Documents)', cat:'incoterms', def:'선적서류와 상환으로 대금을 지급하는 방식. L/C 없이 서류 인도와 동시에 결제가 이뤄짐.', related:['lc','tt']},
+  {id:'extank', code:'Ex Tank', name:'Ex Tank', cat:'ops', def:'육상 저장탱크 인도 조건. 매도인은 지정 탱크에서 화물을 인도하며, 이후 운송·보관 책임은 매수인에게 이전됨.', related:['shoretank','ullage']},
+  {id:'laytime', code:'Laytime', name:'Laytime (하역 허용시간)', cat:'ops', def:'용선계약상 정해진, 화물 하역에 허용되는 시간. 이 시간을 초과하면 체선료, 단축하면 조출료가 발생.', related:['demurrage','dispatch','nor']},
+  {id:'demurrage', code:'Demurrage', name:'Demurrage (체선료)', cat:'ops', def:'허용된 Laytime을 초과해 선박이 항구에 머물 때 선주에게 지급하는 지체보상금.', related:['laytime','dispatch']},
+  {id:'dispatch', code:'Dispatch', name:'Dispatch (조출료)', cat:'ops', def:'Laytime보다 빨리 하역을 마쳤을 때 선주가 용선자에게 돌려주는 보상금. 통상 체선료의 절반 수준.', related:['laytime','demurrage']},
+  {id:'ullage', code:'Ullage', name:'Ullage (탱크 공극 측정)', cat:'ops', def:'탱크 상단에서 유면까지의 빈 공간을 측정해 저장량을 산출하는 방식. Ex Tank 거래의 수량 확정 기준으로 사용됨.', related:['extank','shoretank']},
+  {id:'nor', code:'NOR', name:'NOR (Notice of Readiness)', cat:'ops', def:'선박이 하역 준비를 마쳤음을 알리는 통지서. 통상 이 통지 시점부터 Laytime 카운트가 시작됨.', related:['laytime','discharge']},
+  {id:'discharge', code:'Discharge Port', name:'Discharge Port (양하항)', cat:'ops', def:'화물을 선박에서 내리는 목적항. 계약서상 양하항 지정에 따라 항비·통관 절차가 결정됨.', related:['nor','bl']},
+  {id:'shoretank', code:'Shore Tank', name:'Shore Tank (육상 저장탱크)', cat:'ops', def:'항만·터미널에 위치한 육상 저장시설. Ex Tank 거래와 재고관리의 물리적 기준점이 됨.', related:['extank','ullage']},
+  {id:'sgs', code:'SGS/COA', name:'SGS/COA (검정기관/품질증명서)', cat:'ops', def:'제3자 검정기관(SGS 등)이 발행하는 수량·품질 증명서(Certificate of Analysis). 인도 시점 품질 분쟁의 기준 서류.', related:['ffa','iv']},
+  {id:'uco', code:'UCO', name:'UCO (Used Cooking Oil, 폐식용유)', cat:'cert', def:'조리에 사용된 후 폐기되는 식용유. SAF·바이오디젤의 저탄소 원료로 재활용됨.', related:['ucome','saf','massbalance']},
+  {id:'ucome', code:'UCOME', name:'UCOME (UCO Methyl Ester)', cat:'cert', def:'UCO를 에스터화 공정으로 가공한 바이오디젤 원료. FAME의 한 종류로 UCO 기반임을 명시.', related:['uco','fame']},
+  {id:'saf', code:'SAF', name:'SAF (Sustainable Aviation Fuel)', cat:'cert', def:'항공유를 대체하는 지속가능항공유. UCO 등 폐자원 기반 원료로 생산되며 항공산업 탄소감축 핵심 수단.', related:['uco','corsia','iscc']},
+  {id:'iscc', code:'ISCC', name:'ISCC (International Sustainability & Carbon Certification)', cat:'cert', def:'바이오연료 원료의 지속가능성·탄소배출을 인증하는 국제 인증체계. 공급망 전 단계 인증 유효기간 관리가 필요.', related:['saf','pos','corsia']},
+  {id:'corsia', code:'CORSIA', name:'CORSIA', cat:'cert', def:'국제항공 탄소상쇄·감축제도. ICAO 주도로 국제선 항공사의 탄소배출을 상쇄하도록 요구하며 SAF 수요의 규제적 배경.', related:['saf','iscc']},
+  {id:'rspo', code:'RSPO', name:'RSPO (Roundtable on Sustainable Palm Oil)', cat:'cert', def:'지속가능한 팜유 생산을 인증하는 다자 이해관계자 인증제도. 팜유 공급망의 환경·사회 기준 준수를 증명.', related:['cpo','massbalance']},
+  {id:'massbalance', code:'Mass Balance', name:'Mass Balance (매스밸런스)', cat:'cert', def:'인증 원료와 비인증 원료가 혼합 유통되더라도 장부상 물량으로 인증 비율을 추적·상계하는 방식.', related:['iscc','rspo','pos']},
+  {id:'pos', code:'POS', name:'POS (Proof of Sustainability)', cat:'cert', def:'개별 거래 건마다 발급되는 지속가능성 증빙서류. ISCC 등 인증제도 하에서 원료 이동 시 함께 이전됨.', related:['iscc','massbalance']},
+  {id:'cpo', code:'CPO', name:'CPO (Crude Palm Oil)', cat:'commodity', def:'정제되지 않은 원물 상태의 팜유. 팜유 트레이딩의 기준 원료이자 각종 정제유의 원료.', related:['rbdolein','rbdstearin','ffa']},
+  {id:'rbdolein', code:'RBD Olein', name:'RBD Olein (정제표백탈취 올레인)', cat:'commodity', def:'CPO를 정제·표백·탈취(RBD) 후 분별(Fractionation)해 얻는 액체 성분. 식용유로 주로 유통됨.', related:['cpo','rbdstearin','iv']},
+  {id:'rbdstearin', code:'RBD Stearin', name:'RBD Stearin', cat:'commodity', def:'CPO 분별 공정에서 Olein과 분리되는 고체 성분. 융점이 높아 마가린·비누 등 산업용 원료로 쓰임.', related:['cpo','rbdolein']},
+  {id:'ffa', code:'FFA', name:'FFA (Free Fatty Acid, 유리지방산)', cat:'commodity', def:'유지 내 산패 정도를 나타내는 지표. FFA 함량이 높을수록 품질 저하로 간주돼 가격 조건에 반영됨.', related:['cpo','sgs']},
+  {id:'iv', code:'IV', name:'IV (Iodine Value, 요오드가)', cat:'commodity', def:'유지의 불포화도를 나타내는 수치. 값이 높을수록 불포화지방산 비율이 높아 산화·품질 특성 판단 기준이 됨.', related:['rbdolein','sgs']},
+  {id:'tallow', code:'Tallow', name:'Tallow (우지)', cat:'commodity', def:'소 등 동물성 지방에서 추출한 유지. 바이오디젤·SAF의 대체 원료로 UCO와 함께 사용됨.', related:['fame','uco']},
+  {id:'fame', code:'FAME', name:'FAME (Fatty Acid Methyl Ester)', cat:'commodity', def:'식물성·동물성 유지를 메틸에스터화해 만든 바이오디젤의 총칭. UCOME도 FAME의 한 종류.', related:['ucome','tallow']}
+];
+
+const state = { query:'', activeCat:'all', mode:'dict' };
+let quiz = null;
+
+function byId(id){ return TERMS.find(t=>t.id===id); }
+
+function renderRail(){
+  const rail = document.getElementById('rail');
+  const counts = {};
+  TERMS.forEach(t=>counts[t.cat]=(counts[t.cat]||0)+1);
+  let html = `<button class="chip ${state.activeCat==='all'?'active':''}" data-cat="all" style="color:${state.activeCat==='all'?'#ECE4D2':''}"><span class="dot" style="background:#ECE4D2"></span>전체 <span class="count">${TERMS.length}</span></button>`;
+  Object.keys(CATS).forEach(k=>{
+    const c = CATS[k];
+    html += `<button class="chip ${state.activeCat===k?'active':''}" data-cat="${k}" style="color:${state.activeCat===k?c.color:''}"><span class="dot" style="background:${c.color}"></span>${c.icon} ${c.label} <span class="count">${counts[k]||0}</span></button>`;
+  });
+  rail.innerHTML = html;
+  rail.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.activeCat = btn.dataset.cat; renderAll(); });
+  });
+}
+
+function filteredTerms(){
+  const q = state.query.trim().toLowerCase();
+  return TERMS.filter(t=>{
+    const matchCat = state.activeCat==='all' || t.cat===state.activeCat;
+    const matchQ = !q || t.name.toLowerCase().includes(q) || t.code.toLowerCase().includes(q) || t.def.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  const items = filteredTerms();
+  if(items.length===0){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">검색 결과가 없습니다.</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(t=>{
+    const c = CATS[t.cat];
+    return `<div class="card-wrap" data-id="${t.id}">
+      <div class="card" style="--cat-color:${c.color}">
+        <div class="code">${t.code}</div>
+        <div class="name">${t.name}</div>
+        <div class="preview">${t.def}</div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.card-wrap').forEach(el=>{
+    el.addEventListener('click', ()=>openModal(el.dataset.id));
+  });
+}
+
+function openModal(id){
+  const t = byId(id);
+  const c = CATS[t.cat];
+  const modal = document.getElementById('modal');
+  modal.style.setProperty('--cat-color', c.color);
+  modal.innerHTML = `
+    <button class="close" id="closeModal">✕</button>
+    <div class="code">${t.code} · ${c.icon} ${c.label}</div>
+    <h2>${t.name}</h2>
+    <p class="def">${t.def}</p>
+    <div class="rel-label">연관 용어</div>
+    <div class="rel-chips">${t.related.map(rid=>{
+      const r = byId(rid);
+      return r ? `<button class="rel-chip" data-id="${r.id}">${r.code}</button>` : '';
+    }).join('')}</div>
+  `;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  modal.querySelectorAll('.rel-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>openModal(btn.dataset.id));
+  });
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeModal(); });
+
+/* ---------------- quiz ---------------- */
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+
+function startQuiz(){
+  const pool = shuffle(TERMS).slice(0, 10);
+  quiz = {
+    questions: pool.map(t=>{
+      const distractors = shuffle(TERMS.filter(x=>x.id!==t.id)).slice(0,3).map(x=>x.def);
+      const choices = shuffle([t.def, ...distractors]);
+      return { term:t, choices, correct:t.def };
+    }),
+    idx:0, score:0, answered:false
+  };
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const wrap = document.getElementById('quizWrap');
+  if(!quiz){
+    wrap.innerHTML = `
+      <div class="result">
+        <p class="big">📋</p>
+        <p>10문제로 오늘의 용어 숙지도를 점검해보세요.</p>
+        <button class="btn" id="startBtn">퀴즈 시작</button>
+      </div>`;
+    document.getElementById('startBtn').addEventListener('click', startQuiz);
+    return;
+  }
+  if(quiz.idx >= quiz.questions.length){
+    const pct = Math.round((quiz.score/quiz.questions.length)*100);
+    wrap.innerHTML = `
+      <div class="result">
+        <p class="big">${quiz.score} / ${quiz.questions.length}</p>
+        <p>정답률 ${pct}% — ${pct>=80?'완벽에 가깝습니다.':pct>=50?'절반 이상 맞혔습니다. 사전 모드에서 오답 위주로 복습해보세요.':'사전 모드로 돌아가 관련 용어부터 다시 확인해보세요.'}</p>
+        <button class="btn" id="restartBtn">다시 풀기</button>
+      </div>`;
+    document.getElementById('restartBtn').addEventListener('click', startQuiz);
+    return;
+  }
+  const q = quiz.questions[quiz.idx];
+  const pct = Math.round((quiz.idx/quiz.questions.length)*100);
+  wrap.innerHTML = `
+    <div class="gauge" style="--pct:${pct}"><span>${quiz.idx+1}/${quiz.questions.length}</span></div>
+    <div class="quiz-card">
+      <div class="qcode">${CATS[q.term.cat].icon} ${CATS[q.term.cat].label}</div>
+      <h3>${q.term.code}</h3>
+      <p class="prompt">이 용어의 정의로 알맞은 것을 고르세요.</p>
+      <div id="choices"></div>
+      <div class="quiz-footer">
+        <span class="score">현재 점수: ${quiz.score}</span>
+        <button class="btn" id="nextBtn" disabled>다음</button>
+      </div>
+    </div>
+  `;
+  const choicesEl = document.getElementById('choices');
+  q.choices.forEach(choice=>{
+    const b = document.createElement('button');
+    b.className='choice';
+    b.textContent = choice;
+    b.addEventListener('click', ()=>{
+      if(quiz.answered) return;
+      quiz.answered = true;
+      const isCorrect = choice===q.correct;
+      if(isCorrect) quiz.score++;
+      choicesEl.querySelectorAll('.choice').forEach(c=>{
+        c.classList.add('locked');
+        if(c.textContent===q.correct) c.classList.add('correct');
+        else if(c===b) c.classList.add('wrong');
+      });
+      document.getElementById('nextBtn').disabled=false;
+    });
+    choicesEl.appendChild(b);
+  });
+  document.getElementById('nextBtn').addEventListener('click', ()=>{
+    quiz.idx++; quiz.answered=false; renderQuiz();
+  });
+}
+
+/* ---------------- mode & events ---------------- */
+function setMode(mode){
+  state.mode = mode;
+  document.getElementById('modeDict').classList.toggle('active', mode==='dict');
+  document.getElementById('modeQuiz').classList.toggle('active', mode==='quiz');
+  document.getElementById('dictView').style.display = mode==='dict' ? 'block':'none';
+  document.getElementById('quizView').style.display = mode==='quiz' ? 'block':'none';
+  if(mode==='quiz'){ quiz=null; renderQuiz(); }
+}
+document.getElementById('modeDict').addEventListener('click', ()=>setMode('dict'));
+document.getElementById('modeQuiz').addEventListener('click', ()=>setMode('quiz'));
+document.getElementById('searchInput').addEventListener('input', (e)=>{ state.query=e.target.value; renderGrid(); });
+
+function renderAll(){ renderRail(); renderGrid(); }
+renderAll();
+</script>
+</body>
+</html>
