@@ -1312,29 +1312,95 @@ function closeModal(){ document.getElementById('overlay').classList.remove('show
 document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeModal(); });
 
 /* ---------------- quiz ---------------- */
-function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+function getSelectedCategories(){
+  return [...document.querySelectorAll('.quiz-category:checked')]
+    .map(el=>el.value);
+}
+
+function getQuizPool(){
+  const selected = getSelectedCategories();
+
+  if(selected.length===0){
+    return TERMS;
+  }
+
+  return TERMS.filter(t=>selected.includes(t.cat));
+}
+// ▲ 여기까지 추가
 
 function startQuiz(){
-  const pool = shuffle(TERMS).slice(0, 10);
+
+function startQuiz(){
+
+  const quizPool = getQuizPool();
+
+  if(quizPool.length < 10){
+    alert('선택한 주제의 용어가 10개 미만입니다.');
+    return;
+  }
+
+  const pool = shuffle([...quizPool]).slice(0,10);
+
   quiz = {
     questions: pool.map(t=>{
-      const distractors = shuffle(TERMS.filter(x=>x.id!==t.id)).slice(0,3).map(x=>x.def);
-      const choices = shuffle([t.def, ...distractors]);
-      return { term:t, choices, correct:t.def };
+
+      const distractors = shuffle(
+        quizPool.filter(x=>x.id!==t.id)
+      ).slice(0,3).map(x=>x.def);
+
+      const choices = shuffle([
+        t.def,
+        ...distractors
+      ]);
+
+      return {
+        term:t,
+        choices,
+        correct:t.def
+      };
+
     }),
-    idx:0, score:0, answered:false
+    idx:0,
+    score:0,
+    answered:false
   };
+
   renderQuiz();
+
 }
 
 function renderQuiz(){
   const wrap = document.getElementById('quizWrap');
   if(!quiz){
     wrap.innerHTML = `
-      <div class="result">
-        <p class="big">📋</p>
-        <p>10문제로 오늘의 용어 숙지도를 점검해보세요.</p>
-        <button class="btn" id="startBtn">퀴즈 시작</button>
+<div class="result">
+
+<h3>출제 주제 선택</h3>
+
+<div class="quiz-category-box">
+
+<label><input type="checkbox" class="quiz-category" value="trade" checked> 무역계약</label>
+
+<label><input type="checkbox" class="quiz-category" value="logistics" checked> 물류·선적</label>
+
+<label><input type="checkbox" class="quiz-category" value="customs" checked> 통관·서류</label>
+
+<label><input type="checkbox" class="quiz-category" value="commodity" checked> 원료</label>
+
+<label><input type="checkbox" class="quiz-category" value="sustainability" checked> SAF·인증</label>
+
+<label><input type="checkbox" class="quiz-category" value="finance" checked> 재무</label>
+
+<label><input type="checkbox" class="quiz-category" value="accounting" checked> 회계</label>
+
+<label><input type="checkbox" class="quiz-category" value="workingcapital" checked> 운전자본</label>
+
+</div>
+
+<button class="btn" id="startBtn">
+퀴즈 시작
+</button>
+
       </div>`;
     document.getElementById('startBtn').addEventListener('click', startQuiz);
     return;
