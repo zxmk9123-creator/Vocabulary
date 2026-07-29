@@ -255,10 +255,53 @@
 
 <script>
 const CATS = {
-  incoterms:{label:'인코텀즈·결제', color:'#C08A3E', icon:'⚓'},
-  ops:{label:'오퍼레이션·물류', color:'#B4552F', icon:'🛢️'},
-  cert:{label:'인증·규제 (SAF/UCO)', color:'#3C7A6B', icon:'♻️'},
-  commodity:{label:'상품·원료', color:'#8A8F3C', icon:'🌴'}
+  trade:{
+    label:'무역계약',
+    color:'#C08A3E',
+    icon:'📑'
+  },
+
+  logistics:{
+    label:'물류·선적',
+    color:'#B4552F',
+    icon:'🚢'
+  },
+
+  customs:{
+    label:'통관·서류',
+    color:'#7C5C43',
+    icon:'📦'
+  },
+
+  sustainability:{
+    label:'SAF·인증',
+    color:'#3C7A6B',
+    icon:'♻️'
+  },
+
+  commodity:{
+    label:'원료',
+    color:'#8A8F3C',
+    icon:'🌴'
+  },
+
+  finance:{
+    label:'재무',
+    color:'#4A6FA5',
+    icon:'💰'
+  },
+
+  accounting:{
+    label:'회계',
+    color:'#7A4FA3',
+    icon:'📊'
+  },
+
+  workingcapital:{
+    label:'운전자본',
+    color:'#5A8F3C',
+    icon:'🏦'
+  }
 };
 
 const TERMS = [
@@ -293,6 +336,902 @@ const TERMS = [
   {id:'iv', code:'IV', name:'IV (Iodine Value, 요오드가)', cat:'commodity', def:'유지의 불포화도를 나타내는 수치. 값이 높을수록 불포화지방산 비율이 높아 산화·품질 특성 판단 기준이 됨.', related:['rbdolein','sgs']},
   {id:'tallow', code:'Tallow', name:'Tallow (우지)', cat:'commodity', def:'소 등 동물성 지방에서 추출한 유지. 바이오디젤·SAF의 대체 원료로 UCO와 함께 사용됨.', related:['fame','uco']},
   {id:'fame', code:'FAME', name:'FAME (Fatty Acid Methyl Ester)', cat:'commodity', def:'식물성·동물성 유지를 메틸에스터화해 만든 바이오디젤의 총칭. UCOME도 FAME의 한 종류.', related:['ucome','tallow']}
+  {
+id:'incoterms2020',
+code:'INCOTERMS',
+name:'Incoterms 2020',
+cat:'trade',
+def:'국제상업회의소(ICC)가 제정한 국제무역 거래조건 규칙으로 비용과 위험 이전 시점을 정의한다.',
+related:['fob','cif','cfr']
+},
+
+{
+id:'exw',
+code:'EXW',
+name:'EXW (Ex Works)',
+cat:'trade',
+def:'매도인이 자신의 사업장에서 물품을 인도하면 의무를 다하는 조건이다.',
+related:['fca','fob']
+},
+
+{
+id:'fca',
+code:'FCA',
+name:'FCA (Free Carrier)',
+cat:'trade',
+def:'매도인이 지정 운송인에게 화물을 인도하면 위험이 이전되는 조건이다.',
+related:['exw','fob']
+},
+
+{
+id:'cip',
+code:'CIP',
+name:'CIP',
+cat:'trade',
+def:'운송비와 보험료를 매도인이 부담하는 조건으로 모든 운송방식에서 사용 가능하다.',
+related:['cpt','cif']
+},
+
+{
+id:'cpt',
+code:'CPT',
+name:'CPT',
+cat:'trade',
+def:'운송비는 매도인이 부담하지만 위험은 최초 운송인 인도 시 이전된다.',
+related:['cip']
+},
+
+{
+id:'dap',
+code:'DAP',
+name:'DAP',
+cat:'trade',
+def:'목적지까지 운송은 매도인이 부담하지만 수입통관은 매수인이 수행한다.',
+related:['ddp']
+},
+
+{
+id:'ddp',
+code:'DDP',
+name:'DDP',
+cat:'trade',
+def:'수입통관과 관세까지 모두 매도인이 부담하는 조건이다.',
+related:['dap']
+},
+
+{
+id:'oa',
+code:'OA',
+name:'Open Account',
+cat:'trade',
+def:'상품을 먼저 인도하고 일정 기간 후 대금을 지급하는 신용거래 방식이다.',
+related:['tt','lc']
+},
+
+{
+id:'dp',
+code:'D/P',
+name:'Documents against Payment',
+cat:'trade',
+def:'대금 지급과 동시에 선적서류를 인도하는 결제 방식이다.',
+related:['da','cad']
+},
+
+{
+id:'da',
+code:'D/A',
+name:'Documents against Acceptance',
+cat:'trade',
+def:'환어음 인수만으로 선적서류를 인도하는 방식이다.',
+related:['dp']
+},
+
+{
+id:'salescontract',
+code:'SC',
+name:'Sales Contract',
+cat:'trade',
+def:'매매조건, 수량, 가격, 인도조건 등을 명시한 국제매매 계약서이다.',
+related:['fob','cif']
+},
+
+{
+id:'offtake',
+code:'OFFTAKE',
+name:'Offtake Agreement',
+cat:'trade',
+def:'생산자가 일정 기간 생산물량을 구매자에게 공급하기로 약정하는 장기 구매계약이다.',
+related:['allocation']
+},
+
+{
+id:'allocation',
+code:'ALLOCATION',
+name:'Allocation',
+cat:'trade',
+def:'한정된 생산 또는 선적 물량을 고객별로 배분하는 것을 의미한다.',
+related:['offtake']
+},
+
+{
+id:'spot',
+code:'SPOT',
+name:'Spot Cargo',
+cat:'trade',
+def:'장기계약이 아닌 즉시 거래되는 화물을 의미한다.',
+related:['offtake']
+},
+
+{
+id:'ltc',
+code:'LTC',
+name:'Long Term Contract',
+cat:'trade',
+def:'수개월 또는 수년 동안 지속되는 장기 공급계약이다.',
+related:['spot','offtake']
+},
+
+{
+id:'charterparty',
+code:'CP',
+name:'Charter Party',
+cat:'logistics',
+def:'선박 용선계약서를 의미한다.',
+related:['laytime','demurrage']
+},
+
+{
+id:'eta',
+code:'ETA',
+name:'Estimated Time of Arrival',
+cat:'logistics',
+def:'예상 도착시간 또는 도착예정일이다.',
+related:['etd']
+},
+
+{
+id:'etd',
+code:'ETD',
+name:'Estimated Time of Departure',
+cat:'logistics',
+def:'예상 출항시간 또는 출항예정일이다.',
+related:['eta']
+},
+
+{
+id:'freight',
+code:'FREIGHT',
+name:'Freight',
+cat:'logistics',
+def:'화물을 운송하기 위해 지급하는 운임이다.',
+related:['bl']
+},
+
+{
+id:'awb',
+code:'AWB',
+name:'Air Waybill',
+cat:'logistics',
+def:'항공화물 운송장을 의미한다.',
+related:['bl']
+},
+
+{
+id:'cy',
+code:'CY',
+name:'Container Yard',
+cat:'logistics',
+def:'컨테이너를 인도·인수하는 장소이다.',
+related:['cfs']
+},
+
+{
+id:'cfs',
+code:'CFS',
+name:'Container Freight Station',
+cat:'logistics',
+def:'혼재화물의 적입 및 적출이 이루어지는 장소이다.',
+related:['cy']
+},
+
+{
+id:'transshipment',
+code:'T/S',
+name:'Transshipment',
+cat:'logistics',
+def:'중간 항만에서 다른 선박으로 환적하는 것을 의미한다.',
+related:['bl']
+},
+
+{
+id:'leadtime',
+code:'LEAD TIME',
+name:'Lead Time',
+cat:'logistics',
+def:'주문부터 납품 완료까지 소요되는 전체 기간이다.',
+related:['safetystock']
+},
+
+{
+id:'safetystock',
+code:'SAFETY STOCK',
+name:'Safety Stock',
+cat:'logistics',
+def:'수요 변동이나 공급 지연에 대비하여 추가로 보유하는 재고이다.',
+related:['leadtime']
+},
+  {
+id:'hscode',
+code:'HS CODE',
+name:'HS Code',
+cat:'customs',
+def:'국제적으로 통일된 상품분류번호로 관세율과 수출입 규제를 결정하는 기준이다.',
+related:['duty','tariff','coo']
+},
+
+{
+id:'coo',
+code:'COO',
+name:'Certificate of Origin',
+cat:'customs',
+def:'원산지를 증명하는 서류로 FTA 적용과 관세 감면의 근거가 된다.',
+related:['hscode','fta']
+},
+
+{
+id:'fta',
+code:'FTA',
+name:'Free Trade Agreement',
+cat:'customs',
+def:'국가 간 자유무역협정으로 협정국 간 관세를 인하하거나 철폐한다.',
+related:['coo','tariff']
+},
+
+{
+id:'customs',
+code:'CUSTOMS',
+name:'Customs Clearance',
+cat:'customs',
+def:'세관에 수출입 신고를 완료하고 화물의 반출입 승인을 받는 절차이다.',
+related:['duty','tariff','hscode']
+},
+
+{
+id:'duty',
+code:'DUTY',
+name:'Import Duty',
+cat:'customs',
+def:'수입 물품에 부과되는 세금으로 HS Code와 원산지에 따라 달라진다.',
+related:['tariff','customs']
+},
+
+{
+id:'tariff',
+code:'TARIFF',
+name:'Tariff',
+cat:'customs',
+def:'정부가 수입품에 부과하는 관세율 또는 관세체계를 의미한다.',
+related:['duty']
+},
+
+{
+id:'bonded',
+code:'BONDED',
+name:'Bonded Warehouse',
+cat:'customs',
+def:'관세를 유예한 상태에서 화물을 보관할 수 있는 보세창고이다.',
+related:['customs']
+},
+
+{
+id:'detention',
+code:'DETENTION',
+name:'Container Detention',
+cat:'logistics',
+def:'컨테이너를 터미널 밖으로 반출한 후 반납이 지연되어 발생하는 비용이다.',
+related:['demurrage']
+},
+
+{
+id:'terminaldem',
+code:'DEM',
+name:'Container Demurrage',
+cat:'logistics',
+def:'컨테이너가 터미널 내에 장기간 보관될 때 발생하는 비용이다.',
+related:['detention']
+},
+
+{
+id:'stuffing',
+code:'STUFFING',
+name:'Stuffing',
+cat:'logistics',
+def:'컨테이너 내부에 화물을 적재하는 작업이다.',
+related:['stripping']
+},
+
+{
+id:'stripping',
+code:'STRIPPING',
+name:'Stripping',
+cat:'logistics',
+def:'컨테이너에서 화물을 꺼내는 작업이다.',
+related:['stuffing']
+},
+
+{
+id:'moq',
+code:'MOQ',
+name:'Minimum Order Quantity',
+cat:'trade',
+def:'공급자가 요구하는 최소 주문수량이다.',
+related:['allocation']
+},
+
+{
+id:'forecast',
+code:'FORECAST',
+name:'Demand Forecast',
+cat:'logistics',
+def:'향후 수요를 예측하여 생산과 구매계획을 수립하는 것이다.',
+related:['inventoryturnover','safetystock']
+},
+
+{
+id:'inventoryturnover',
+code:'INV TURN',
+name:'Inventory Turnover',
+cat:'logistics',
+def:'일정 기간 동안 재고가 몇 번 판매 또는 사용되었는지를 나타내는 지표이다.',
+related:['inventory','workingcapital']
+},
+
+{
+id:'tankstorage',
+code:'TANK',
+name:'Tank Storage',
+cat:'logistics',
+def:'액체 화물을 저장하기 위한 저장탱크 시설이다.',
+related:['extank','ullage']
+},
+
+{
+id:'nomination',
+code:'NOMINATION',
+name:'Cargo Nomination',
+cat:'trade',
+def:'선적 일정과 화물 정보를 공식적으로 지정하는 절차이다.',
+related:['eta','etd']
+},
+
+{
+id:'lifting',
+code:'LIFTING',
+name:'Cargo Lifting',
+cat:'logistics',
+def:'계약된 화물을 실제 선적하는 행위를 의미한다.',
+related:['nomination']
+},
+
+{
+id:'inspection',
+code:'INSPECTION',
+name:'Pre-shipment Inspection',
+cat:'customs',
+def:'선적 전에 수량과 품질을 검사하는 절차이다.',
+related:['sgs']
+},
+
+{
+id:'packinglist',
+code:'P/L',
+name:'Packing List',
+cat:'customs',
+def:'포장 단위와 수량을 표시한 선적서류이다.',
+related:['invoice']
+},
+
+{
+id:'invoice',
+code:'INVOICE',
+name:'Commercial Invoice',
+cat:'customs',
+def:'거래금액과 품목을 기재한 상업송장으로 통관의 핵심 서류이다.',
+related:['packinglist']
+},
+
+{
+id:'cargoinsurance',
+code:'CARGO INS',
+name:'Cargo Insurance',
+cat:'trade',
+def:'운송 중 발생할 수 있는 화물 손실을 보상하는 보험이다.',
+related:['cif','cip']
+},
+
+{
+id:'shortshipment',
+code:'SHORT',
+name:'Short Shipment',
+cat:'logistics',
+def:'계약 수량보다 적게 선적된 상태를 의미한다.',
+related:['bl']
+},
+
+{
+id:'overshipment',
+code:'OVER',
+name:'Over Shipment',
+cat:'logistics',
+def:'계약 수량보다 많이 선적된 상태를 의미한다.',
+related:['shortshipment']
+},
+
+{
+id:'forcemajeure',
+code:'FM',
+name:'Force Majeure',
+cat:'trade',
+def:'천재지변이나 전쟁 등 계약 당사자가 통제할 수 없는 사유로 계약 의무를 면제하는 조항이다.',
+related:['salescontract']
+},
+
+{
+id:'claim',
+code:'CLAIM',
+name:'Cargo Claim',
+cat:'trade',
+def:'화물 손상이나 수량 부족에 대해 손해배상을 요구하는 절차이다.',
+related:['cargoinsurance','sgs']
+}, 
+  {
+id:'asset',
+code:'ASSET',
+name:'Asset (자산)',
+cat:'finance',
+def:'기업이 소유하거나 통제하여 미래 경제적 효익을 창출할 것으로 기대되는 자원이다.',
+related:['liability','equity']
+},
+
+{
+id:'liability',
+code:'LIABILITY',
+name:'Liability (부채)',
+cat:'finance',
+def:'기업이 미래에 상환해야 할 경제적 의무를 의미한다.',
+related:['asset','equity']
+},
+
+{
+id:'equity',
+code:'EQUITY',
+name:'Equity (자본)',
+cat:'finance',
+def:'자산에서 부채를 차감한 순자산으로 주주의 지분을 의미한다.',
+related:['asset','liability']
+},
+
+{
+id:'bs',
+code:'B/S',
+name:'Balance Sheet',
+cat:'finance',
+def:'특정 시점의 자산, 부채, 자본을 보여주는 재무상태표이다.',
+related:['is','cf']
+},
+
+{
+id:'is',
+code:'P/L',
+name:'Income Statement',
+cat:'finance',
+def:'일정 기간 동안의 수익과 비용 및 순이익을 나타내는 손익계산서이다.',
+related:['bs','revenue']
+},
+
+{
+id:'cf',
+code:'C/F',
+name:'Cash Flow Statement',
+cat:'finance',
+def:'영업, 투자, 재무활동으로 인한 현금의 유입과 유출을 보여주는 현금흐름표이다.',
+related:['bs','workingcapital']
+},
+
+{
+id:'revenue',
+code:'REVENUE',
+name:'Revenue (매출)',
+cat:'finance',
+def:'기업이 상품이나 서비스를 제공하고 얻는 총수익이다.',
+related:['cogs','grossprofit']
+},
+
+{
+id:'cogs',
+code:'COGS',
+name:'Cost of Goods Sold',
+cat:'finance',
+def:'판매된 제품이나 상품의 원가를 의미한다.',
+related:['grossprofit']
+},
+
+{
+id:'grossprofit',
+code:'GP',
+name:'Gross Profit',
+cat:'finance',
+def:'매출에서 매출원가를 차감한 금액이다.',
+related:['grossmargin','cogs']
+},
+
+{
+id:'grossmargin',
+code:'GM',
+name:'Gross Margin',
+cat:'finance',
+def:'매출총이익을 매출액으로 나눈 비율이다.',
+related:['grossprofit']
+},
+
+{
+id:'op',
+code:'OP',
+name:'Operating Profit',
+cat:'finance',
+def:'영업활동을 통해 발생한 이익이다.',
+related:['ebitda']
+},
+
+{
+id:'ebitda',
+code:'EBITDA',
+name:'EBITDA',
+cat:'finance',
+def:'이자·법인세·감가상각비 차감 전 영업이익으로 기업의 현금창출능력을 평가하는 지표이다.',
+related:['op','ebit']
+},
+
+{
+id:'ebit',
+code:'EBIT',
+name:'EBIT',
+cat:'finance',
+def:'이자와 법인세 차감 전 이익이다.',
+related:['ebitda']
+},
+
+{
+id:'netincome',
+code:'NI',
+name:'Net Income',
+cat:'finance',
+def:'모든 비용과 세금을 차감한 최종 순이익이다.',
+related:['op']
+},
+
+{
+id:'workingcapital',
+code:'WC',
+name:'Working Capital',
+cat:'workingcapital',
+def:'기업의 단기 영업활동에 사용되는 운전자본으로 유동자산에서 유동부채를 차감한 금액이다.',
+related:['ar','ap','inventory']
+},
+
+{
+id:'currentasset',
+code:'CA',
+name:'Current Asset',
+cat:'workingcapital',
+def:'1년 이내 현금화 가능한 자산이다.',
+related:['currentliability','workingcapital']
+},
+
+{
+id:'currentliability',
+code:'CL',
+name:'Current Liability',
+cat:'workingcapital',
+def:'1년 이내 상환해야 하는 부채이다.',
+related:['workingcapital']
+},
+
+{
+id:'ar',
+code:'AR',
+name:'Accounts Receivable',
+cat:'workingcapital',
+def:'매출이 발생했지만 아직 회수하지 못한 외상매출금을 의미한다.',
+related:['ap','dso']
+},
+
+{
+id:'ap',
+code:'AP',
+name:'Accounts Payable',
+cat:'workingcapital',
+def:'거래처에 아직 지급하지 않은 외상매입금을 의미한다.',
+related:['ar','dpo']
+},
+
+{
+id:'inventory',
+code:'INV',
+name:'Inventory',
+cat:'workingcapital',
+def:'판매나 생산을 위해 보유하고 있는 재고자산이다.',
+related:['inventoryturnover','workingcapital']
+},
+
+{
+id:'dso',
+code:'DSO',
+name:'Days Sales Outstanding',
+cat:'workingcapital',
+def:'매출채권을 평균적으로 회수하는 데 걸리는 기간이다.',
+related:['ar','ccc']
+},
+
+{
+id:'dpo',
+code:'DPO',
+name:'Days Payable Outstanding',
+cat:'workingcapital',
+def:'매입채무를 지급하는 데 걸리는 평균 기간이다.',
+related:['ap','ccc']
+},
+
+{
+id:'dio',
+code:'DIO',
+name:'Days Inventory Outstanding',
+cat:'workingcapital',
+def:'재고가 판매되기까지 평균적으로 보유되는 기간이다.',
+related:['inventory','ccc']
+},
+
+{
+id:'ccc',
+code:'CCC',
+name:'Cash Conversion Cycle',
+cat:'workingcapital',
+def:'재고를 현금으로 전환하는 데 걸리는 기간으로 DIO + DSO - DPO로 계산된다.',
+related:['ar','ap','workingcapital']
+},
+
+{
+id:'aging',
+code:'AGING',
+name:'AR/AP Aging',
+cat:'workingcapital',
+def:'매출채권이나 매입채무를 기간별로 구분하여 관리하는 보고서이다.',
+related:['ar','ap']
+},
+  {
+id:'depreciation',
+code:'DEP',
+name:'Depreciation (감가상각)',
+cat:'accounting',
+def:'유형자산의 취득원가를 내용연수 동안 비용으로 배분하는 회계처리이다.',
+related:['amortization','capex']
+},
+
+{
+id:'amortization',
+code:'AMORT',
+name:'Amortization (무형자산 상각)',
+cat:'accounting',
+def:'특허권·소프트웨어 등 무형자산의 취득원가를 사용기간 동안 비용으로 배분하는 회계처리이다.',
+related:['depreciation']
+},
+
+{
+id:'impairment',
+code:'IMP',
+name:'Impairment Loss',
+cat:'accounting',
+def:'자산의 회수가능가액이 장부금액보다 낮을 경우 인식하는 손상차손이다.',
+related:['asset']
+},
+
+{
+id:'provision',
+code:'PROVISION',
+name:'Provision (충당부채)',
+cat:'accounting',
+def:'발생 가능성이 높고 금액을 합리적으로 추정할 수 있는 미래 의무를 미리 인식하는 부채이다.',
+related:['liability']
+},
+
+{
+id:'accrual',
+code:'ACCRUAL',
+name:'Accrual',
+cat:'accounting',
+def:'현금 수수와 관계없이 발생한 시점에 수익과 비용을 인식하는 발생주의 회계원칙이다.',
+related:['prepayment']
+},
+
+{
+id:'prepayment',
+code:'PREPAID',
+name:'Prepayment',
+cat:'accounting',
+def:'서비스 제공 전에 미리 지급한 금액으로 향후 비용으로 인식될 자산이다.',
+related:['accrual']
+},
+
+{
+id:'journal',
+code:'JE',
+name:'Journal Entry',
+cat:'accounting',
+def:'회계거래를 차변과 대변으로 기록하는 분개이다.',
+related:['trialbalance','closing']
+},
+
+{
+id:'trialbalance',
+code:'TB',
+name:'Trial Balance',
+cat:'accounting',
+def:'모든 계정의 차변과 대변 잔액을 집계하여 분개의 정확성을 확인하는 시산표이다.',
+related:['journal','closing']
+},
+
+{
+id:'closing',
+code:'CLOSING',
+name:'Closing',
+cat:'accounting',
+def:'회계기간 종료 시 수익과 비용 계정을 마감하여 재무제표를 작성하는 절차이다.',
+related:['trialbalance']
+},
+
+{
+id:'audit',
+code:'AUDIT',
+name:'Audit',
+cat:'accounting',
+def:'재무제표가 회계기준에 따라 적정하게 작성되었는지 독립된 감사인이 검증하는 절차이다.',
+related:['closing']
+},
+
+{
+id:'capex',
+code:'CAPEX',
+name:'Capital Expenditure',
+cat:'finance',
+def:'설비, 건물, 기계 등 장기 자산을 취득하기 위한 투자 지출이다.',
+related:['opex','depreciation']
+},
+
+{
+id:'opex',
+code:'OPEX',
+name:'Operating Expense',
+cat:'finance',
+def:'기업의 일상적인 영업활동에서 발생하는 운영비용이다.',
+related:['capex']
+},
+
+{
+id:'fcf',
+code:'FCF',
+name:'Free Cash Flow',
+cat:'finance',
+def:'영업활동으로 창출된 현금에서 자본적 지출(CAPEX)을 차감한 잉여현금이다.',
+related:['capex','cf']
+},
+
+{
+id:'roe',
+code:'ROE',
+name:'Return on Equity',
+cat:'finance',
+def:'자기자본 대비 순이익의 비율로 주주자본의 수익성을 나타낸다.',
+related:['roa']
+},
+
+{
+id:'roa',
+code:'ROA',
+name:'Return on Assets',
+cat:'finance',
+def:'총자산 대비 순이익의 비율로 자산 활용 효율성을 평가하는 지표이다.',
+related:['roe']
+},
+
+{
+id:'currentratio',
+code:'CR',
+name:'Current Ratio',
+cat:'workingcapital',
+def:'유동자산을 유동부채로 나눈 비율로 단기 지급능력을 나타낸다.',
+related:['quickratio','workingcapital']
+},
+
+{
+id:'quickratio',
+code:'QR',
+name:'Quick Ratio',
+cat:'workingcapital',
+def:'재고를 제외한 유동자산을 유동부채로 나눈 비율이다.',
+related:['currentratio']
+},
+
+{
+id:'debtratio',
+code:'DEBT',
+name:'Debt Ratio',
+cat:'finance',
+def:'총부채를 총자산으로 나눈 비율로 재무안정성을 평가한다.',
+related:['liability']
+},
+
+{
+id:'hedging',
+code:'HEDGE',
+name:'Hedging',
+cat:'finance',
+def:'환율이나 원자재 가격 변동 위험을 줄이기 위해 선물·선도 등 파생상품을 활용하는 위험관리 전략이다.',
+related:['fxgainloss']
+},
+
+{
+id:'fxgainloss',
+code:'FX',
+name:'FX Gain / Loss',
+cat:'finance',
+def:'환율 변동으로 발생하는 외환차익 또는 외환차손을 의미한다.',
+related:['hedging']
+},
+
+{
+id:'budget',
+code:'BUDGET',
+name:'Budget',
+cat:'finance',
+def:'미래 일정 기간의 예상 수익과 비용을 계획한 예산이다.',
+related:['forecast']
+},
+
+{
+id:'variance',
+code:'VAR',
+name:'Budget Variance',
+cat:'finance',
+def:'예산과 실제 실적의 차이를 분석하여 경영성과를 평가하는 것이다.',
+related:['budget']
+},
+
+{
+id:'fixedcost',
+code:'FC',
+name:'Fixed Cost',
+cat:'finance',
+def:'생산량과 관계없이 일정하게 발생하는 비용이다.',
+related:['variablecost']
+},
+
+{
+id:'variablecost',
+code:'VC',
+name:'Variable Cost',
+cat:'finance',
+def:'생산량이나 판매량에 비례하여 변동하는 비용이다.',
+related:['fixedcost']
+},
+
+{
+id:'breakeven',
+code:'BEP',
+name:'Break-even Point',
+cat:'finance',
+def:'총수익과 총비용이 같아 손익이 0이 되는 매출 수준이다.',
+related:['fixedcost','variablecost']
+}
 ];
 
 const state = { query:'', activeCat:'all', mode:'dict' };
