@@ -1312,6 +1312,14 @@ function closeModal(){ document.getElementById('overlay').classList.remove('show
 document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeModal(); });
 
 /* ---------------- quiz ---------------- */
+
+function shuffle(arr){
+  return arr
+    .map(v => [Math.random(), v])
+    .sort((a,b)=>a[0]-b[0])
+    .map(v=>v[1]);
+}
+
 function getSelectedCategories(){
   return [...document.querySelectorAll('.quiz-category:checked')]
     .map(el=>el.value);
@@ -1326,25 +1334,29 @@ function getQuizPool(){
 
   return TERMS.filter(t=>selected.includes(t.cat));
 }
-// ▲ 여기까지 추가
+
 
 function startQuiz(){
 
   const quizPool = getQuizPool();
 
-  if(quizPool.length < 10){
-    alert('선택한 주제의 용어가 10개 미만입니다.');
+  if(quizPool.length===0){
+    alert("선택된 주제에 문제가 없습니다.");
     return;
   }
 
-  const pool = shuffle([...quizPool]).slice(0,10);
+  const questionCount = Math.min(10, quizPool.length);
+
+  const pool = shuffle([...quizPool]).slice(0, questionCount);
 
   quiz = {
     questions: pool.map(t=>{
 
       const distractors = shuffle(
         quizPool.filter(x=>x.id!==t.id)
-      ).slice(0,3).map(x=>x.def);
+      )
+      .slice(0,3)
+      .map(x=>x.def);
 
       const choices = shuffle([
         t.def,
@@ -1358,6 +1370,7 @@ function startQuiz(){
       };
 
     }),
+
     idx:0,
     score:0,
     answered:false
@@ -1369,38 +1382,47 @@ function startQuiz(){
 
 function renderQuiz(){
   const wrap = document.getElementById('quizWrap');
-  if(!quiz){
-    wrap.innerHTML = `
-<div class="result">
+if(!quiz){
 
-<h3>출제 주제 선택</h3>
+  let html = `
+  <div class="result">
 
-<div class="quiz-category-box">
+    <h3>출제 주제 선택</h3>
 
-<label><input type="checkbox" class="quiz-category" value="trade" checked> 무역계약</label>
+    <div class="quiz-category-box">
+  `;
 
-<label><input type="checkbox" class="quiz-category" value="logistics" checked> 물류·선적</label>
+  Object.entries(CATS).forEach(([key,value])=>{
+    html += `
+      <label>
+        <input
+          type="checkbox"
+          class="quiz-category"
+          value="${key}"
+          checked>
+        ${value.icon} ${value.label}
+      </label>
+    `;
+  });
 
-<label><input type="checkbox" class="quiz-category" value="customs" checked> 통관·서류</label>
+  html += `
+    </div>
 
-<label><input type="checkbox" class="quiz-category" value="commodity" checked> 원료</label>
+    <button class="btn" id="startBtn">
+      퀴즈 시작
+    </button>
 
-<label><input type="checkbox" class="quiz-category" value="sustainability" checked> SAF·인증</label>
+  </div>
+  `;
 
-<label><input type="checkbox" class="quiz-category" value="finance" checked> 재무</label>
+  wrap.innerHTML = html;
 
-<label><input type="checkbox" class="quiz-category" value="accounting" checked> 회계</label>
+  document
+    .getElementById("startBtn")
+    .addEventListener("click", startQuiz);
 
-<label><input type="checkbox" class="quiz-category" value="workingcapital" checked> 운전자본</label>
-
-</div>
-
-<button class="btn" id="startBtn">
-퀴즈 시작
-</button>
-
-      </div>`;
-    document.getElementById('startBtn').addEventListener('click', startQuiz);
+  return;
+}
     return;
   }
   if(quiz.idx >= quiz.questions.length){
@@ -1453,6 +1475,27 @@ function renderQuiz(){
   });
 }
 
+.quiz-category-box{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin:20px 0;
+    text-align:left;
+}
+
+.quiz-category-box label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    color:var(--cream);
+    font-family:var(--font-body);
+}
+
+.quiz-category-box input{
+    accent-color:var(--brass);
+}
+  
 /* ---------------- mode & events ---------------- */
 function setMode(mode){
   state.mode = mode;
