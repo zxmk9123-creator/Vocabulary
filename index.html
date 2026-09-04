@@ -184,6 +184,10 @@
     color:var(--ink);cursor:pointer;
   }
   .rel-chip:hover{background:rgba(28,42,36,0.12);}
+  .modal .calc-label{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 6px;}
+  .modal .formula{font-family:var(--font-mono);font-size:.85rem;background:rgba(28,42,36,0.06);border:1px solid rgba(28,42,36,0.15);border-radius:3px;padding:8px 10px;margin:0 0 4px;}
+  .modal .components{margin:0 0 4px;padding-left:18px;font-size:.9rem;line-height:1.55;}
+  .modal .example{font-size:.9rem;line-height:1.6;background:rgba(192,138,62,0.08);border-left:3px solid var(--cat-color,var(--brass));padding:8px 12px;margin:0;white-space:pre-line;}
 
   /* ---------- quiz ---------- */
   .quiz-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0;}
@@ -322,6 +326,12 @@ const CATS = {
     label:'운전자본',
     color:'#5A8F3C',
     icon:'🏦'
+  },
+
+  acctcalc:{
+    label:'Accounting & Financial Calculation',
+    color:'#A64C79',
+    icon:'🧮'
   }
 };
 
@@ -1253,6 +1263,232 @@ name:'Break-even Point',
 cat:'finance',
 def:'총수익과 총비용이 같아 손익이 0이 되는 매출 수준이다.',
 related:['fixedcost','variablecost']
+},
+
+/* ---- Accounting & Financial Calculation (유지Trading 실무 산식) ---- */
+{
+  id:'afcrevenue', code:'REVENUE', name:'Revenue (매출액)', cat:'acctcalc',
+  def:'일정 기간 상품 판매로 발생한 총 판매금액이다. Trading에서는 계약 단가와 인도 물량의 곱으로 산출되며, 인도조건(FOB/CIF 등)에 따라 인식 시점이 달라진다.',
+  formula:'Revenue = Sales Price × Volume',
+  components:['Sales Price : 계약상 판매단가(USD/MT)','Volume : 인도 물량(MT)'],
+  example:'RBD Palm Olein 5,000 MT × USD 1,120/MT\n→ Revenue = USD 5,600,000',
+  related:['afccogs','afcgrossprofit']
+},
+{
+  id:'afccogs', code:'COGS', name:'Cost of Goods Sold (매출원가)', cat:'acctcalc',
+  def:'판매된 상품을 조달하는 데 직접 소요된 원가다. Trading에서는 매입원가에 Landed Cost(운임·보험·통관비 등)를 더해 산출한다.',
+  formula:'COGS = Landed Cost (Purchase Price + Freight + Insurance + Duty + Handling)',
+  components:['Purchase Price : FOB 매입가격','Landed Cost 구성비용 : 운임·보험·관세·부대비용'],
+  example:'매입 5,000 MT × USD 1,020/MT = USD 5,100,000\nLanded Cost 가산 : USD 150,000\n→ COGS = USD 5,250,000',
+  related:['afclandedcost','afcgrossprofit']
+},
+{
+  id:'afcgrossprofit', code:'GP', name:'Gross Profit (매출총이익)', cat:'acctcalc',
+  def:'매출에서 매출원가를 차감한 이익이다. Trading에서는 매입가격과 Landed Cost 관리가 Gross Profit의 핵심이며, 회계상 손익계산서 항목이다.',
+  formula:'Gross Profit = Revenue - COGS',
+  components:['Revenue : 총 판매금액','COGS : 매입원가 및 직접원가(Landed Cost)'],
+  example:'Revenue USD 5,600,000 - COGS USD 5,250,000\n→ Gross Profit = USD 350,000',
+  related:['afcrevenue','afccogs','afcgrossmargin','afctradingmargin']
+},
+{
+  id:'afcgrossmargin', code:'GM', name:'Gross Margin (매출총이익률)', cat:'acctcalc',
+  def:'매출액 대비 Gross Profit의 비율이다. Trading에서는 상품·항로별 마진율을 비교해 자본 배분 우선순위를 정하는 데 사용된다.',
+  formula:'Gross Margin = Gross Profit / Revenue × 100',
+  components:['Gross Profit : 매출총이익','Revenue : 매출액'],
+  example:'Gross Profit USD 350,000 / Revenue USD 5,600,000\n→ Gross Margin = 6.25%',
+  related:['afcgrossprofit']
+},
+{
+  id:'afcopex', code:'OPEX', name:'Operating Expenses (영업비용)', cat:'acctcalc',
+  def:'매출원가 이외에 영업활동을 유지하기 위해 발생하는 비용이다. Trading 데스크 운영비·인건비·시스템 이용료 등이 해당된다.',
+  formula:'Operating Expenses = SG&A + Other Operating Costs',
+  components:['SG&A : 판매비와 관리비','Other Operating Costs : 기타 영업활동 관련 비용'],
+  example:'SG&A USD 40,000 + Other Operating Costs USD 10,000\n→ Operating Expenses = USD 50,000',
+  related:['afcgrossprofit','afcebit']
+},
+{
+  id:'afcebit', code:'EBIT', name:'Operating Profit / EBIT (영업이익)', cat:'acctcalc',
+  def:'Gross Profit에서 영업비용을 차감한, 이자와 세금 지급 전 영업활동만의 이익이다. 헤지손익·환차손익 등 영업외 항목을 제외해 순수 Trading 수익성을 보여준다.',
+  formula:'EBIT = Gross Profit - Operating Expenses',
+  components:['Gross Profit : 매출총이익','Operating Expenses : 영업비용'],
+  example:'Gross Profit USD 350,000 - OPEX USD 50,000\n→ EBIT = USD 300,000',
+  related:['afcgrossprofit','afcopex','afcopmargin','afcebitda']
+},
+{
+  id:'afcopmargin', code:'OP MARGIN', name:'Operating Margin (영업이익률)', cat:'acctcalc',
+  def:'매출액 대비 EBIT의 비율이다. 원자재 가격 변동성이 큰 Trading 특성상 Gross Margin보다 변동폭이 작게 관리되는지 확인하는 지표다.',
+  formula:'Operating Margin = EBIT / Revenue × 100',
+  components:['EBIT : 영업이익','Revenue : 매출액'],
+  example:'EBIT USD 300,000 / Revenue USD 5,600,000\n→ Operating Margin = 5.36%',
+  related:['afcebit']
+},
+{
+  id:'afcebitda', code:'EBITDA', name:'EBITDA', cat:'acctcalc',
+  def:'EBIT에 감가상각비와 무형자산상각비를 더한 값이다. 설비·탱크·물류 인프라 투자 부담을 제외한 현금창출력을 비교할 때 사용된다.',
+  formula:'EBITDA = EBIT + Depreciation + Amortization',
+  components:['EBIT : 영업이익','Depreciation : 유형자산 감가상각비','Amortization : 무형자산 상각비'],
+  example:'EBIT USD 300,000 + D&A USD 20,000\n→ EBITDA = USD 320,000',
+  related:['afcebit','afcebitdamargin']
+},
+{
+  id:'afcebitdamargin', code:'EBITDA MARGIN', name:'EBITDA Margin', cat:'acctcalc',
+  def:'매출액 대비 EBITDA의 비율이다. 자산 규모나 감가상각 정책이 다른 사업부·법인 간 현금창출력을 비교할 때 활용된다.',
+  formula:'EBITDA Margin = EBITDA / Revenue × 100',
+  components:['EBITDA : 상각전영업이익','Revenue : 매출액'],
+  example:'EBITDA USD 320,000 / Revenue USD 5,600,000\n→ EBITDA Margin = 5.71%',
+  related:['afcebitda']
+},
+{
+  id:'afcebt', code:'EBT', name:'Earnings Before Tax (EBT)', cat:'acctcalc',
+  def:'EBIT에서 이자비용 등 영업외손익을 반영한, 법인세 차감 전 이익이다. Trading에서는 선물·옵션 헤지손익, 환차손익, 차입금 이자비용이 주요 영업외 항목이다.',
+  formula:'EBT = EBIT - Net Interest Expense ± Non-operating Gain/Loss',
+  components:['EBIT : 영업이익','Net Interest Expense : 순이자비용','Non-operating Gain/Loss : 헤지손익·환차손익 등'],
+  example:'EBIT USD 300,000 - Interest USD 20,000 + FX 환차익 USD 10,000\n→ EBT = USD 290,000',
+  related:['afcebit','afcnetincome']
+},
+{
+  id:'afcnetincome', code:'NI', name:'Net Income (당기순이익)', cat:'acctcalc',
+  def:'EBT에서 법인세비용을 차감한 최종 순이익이다. 회사 전체 손익의 최종 결과이며 배당가능이익 산정의 기초가 된다.',
+  formula:'Net Income = EBT - Tax',
+  components:['EBT : 법인세차감전순이익','Tax : 법인세비용'],
+  example:'EBT USD 290,000 - Tax(25%) USD 72,500\n→ Net Income = USD 217,500',
+  related:['afcebt','afcnetmargin','afcocf']
+},
+{
+  id:'afcnetmargin', code:'NET MARGIN', name:'Net Margin', cat:'acctcalc',
+  def:'매출액 대비 Net Income의 비율이다. 세금·이자비용까지 모두 반영한 최종 수익성 지표로, 저마진 구조인 Trading 업 특성상 통상 한 자릿수 초반에 형성된다.',
+  formula:'Net Margin = Net Income / Revenue × 100',
+  components:['Net Income : 당기순이익','Revenue : 매출액'],
+  example:'Net Income USD 217,500 / Revenue USD 5,600,000\n→ Net Margin = 3.88%',
+  related:['afcnetincome']
+},
+{
+  id:'afctradingmargin', code:'TRADING MARGIN', name:'Trading Margin', cat:'acctcalc',
+  def:'매입가격(Landed Cost 기준)과 판매가격의 차이를 물량으로 곱한, 개별 계약(Cargo) 단위의 총마진이다. 손익계산서상 Gross Profit과 개념은 같지만 회계기간이 아닌 딜 단위로 즉시 산출하는 Management Accounting 지표라는 점이 다르다.',
+  formula:'Trading Margin = (Sales Price - Landed Cost per Unit) × Volume',
+  components:['Sales Price : 판매단가','Landed Cost per Unit : 단위당 Landed Cost','Volume : 거래 물량'],
+  example:'(USD 1,120/MT - USD 1,050/MT) × 5,000 MT\n→ Trading Margin = USD 350,000',
+  related:['afcgrossprofit','afcunitmargin','afclandedcost']
+},
+{
+  id:'afcunitmargin', code:'UNIT MARGIN', name:'Unit Margin', cat:'acctcalc',
+  def:'1 MT당 마진으로, 계약 규모가 다른 여러 카고의 수익성을 동일선상에서 비교할 때 사용하는 표준화 지표다.',
+  formula:'Unit Margin = Trading Margin / Volume',
+  components:['Trading Margin : 계약 총마진','Volume : 거래 물량'],
+  example:'Trading Margin USD 350,000 / 5,000 MT\n→ Unit Margin = USD 70/MT',
+  related:['afctradingmargin']
+},
+{
+  id:'afccontmargin', code:'CM', name:'Contribution Margin', cat:'acctcalc',
+  def:'매출에서 변동비만을 차감한 이익으로, 고정비를 회수하고 남는 금액이다. 신규 카고를 추가 체결할 가치가 있는지, 고정비 배분 없이 판단하는 지표다.',
+  formula:'Contribution Margin = Revenue - Variable Cost',
+  components:['Revenue : 매출액','Variable Cost : 매입원가·운임 등 물량 비례 변동비'],
+  example:'Revenue USD 5,600,000 - Variable Cost USD 5,250,000\n→ Contribution Margin = USD 350,000',
+  related:['afccontmarginratio','afcbepvolume']
+},
+{
+  id:'afccontmarginratio', code:'CM RATIO', name:'Contribution Margin Ratio', cat:'acctcalc',
+  def:'매출액 대비 Contribution Margin의 비율이다. 비율이 높을수록 물량 증가가 고정비 회수에 기여하는 속도가 빠르다.',
+  formula:'Contribution Margin Ratio = Contribution Margin / Revenue × 100',
+  components:['Contribution Margin : 공헌이익','Revenue : 매출액'],
+  example:'Contribution Margin USD 350,000 / Revenue USD 5,600,000\n→ Contribution Margin Ratio = 6.25%',
+  related:['afccontmargin']
+},
+{
+  id:'afclandedcost', code:'LANDED COST', name:'Landed Cost', cat:'acctcalc',
+  def:'상품이 최종 목적지(항구·탱크)에 도착하기까지 발생하는 모든 비용을 매입가격에 합산한 총원가다. 인도조건(FOB/CIF/Ex Tank)이 다른 오퍼를 동일 기준으로 비교할 때 반드시 환산해야 하는 개념이다.',
+  formula:'Landed Cost = FOB Purchase Price + Ocean Freight + Insurance + Import Duty + Port/Handling Cost',
+  components:['FOB Purchase Price : 본선인도 기준 매입단가','Ocean Freight : 해상운임','Insurance : 해상보험료','Import Duty : 수입관세','Port/Handling Cost : 하역비·창고료 등 부대비용'],
+  example:'FOB 1,020 × 5,000 MT = USD 5,100,000\n+ Freight 100,000 + Insurance 10,000 + Duty 30,000 + Handling 10,000\n→ Landed Cost = USD 5,250,000 (USD 1,050/MT)',
+  related:['afccogs','afctradingmargin','afcbepprice']
+},
+{
+  id:'afcnetback', code:'NETBACK', name:'Netback', cat:'acctcalc',
+  def:'최종 판매가격에서 운임·보험·관세 등 판매지까지의 비용을 역산해 공제한, 공급지 기준의 실질 실현가격이다. 여러 목적지로 판매 가능한 카고를 어디로 보낼지 결정할 때 비교 기준으로 쓰인다.',
+  formula:'Netback = Destination Sales Price - Freight - Insurance - Duty - Port/Handling Cost',
+  components:['Destination Sales Price : 목적지 판매단가','Freight/Insurance/Duty/Handling : 공급지에서 목적지까지 발생하는 비용'],
+  example:'목적지 판매가 USD 1,150/MT - 운임·보험·기타 USD 40/MT\n→ Netback = USD 1,110/MT',
+  related:['afclandedcost']
+},
+{
+  id:'afcbepprice', code:'BEP PRICE', name:'Break-even Price', cat:'acctcalc',
+  def:'해당 물량에서 손익이 0이 되는 판매단가다. 시장가격이 이 수준 이하로 하락하면 해당 카고는 손실 구간에 진입한다.',
+  formula:'Break-even Price = (Total Fixed Cost + Total Variable Cost) / Volume',
+  components:['Total Fixed Cost : 해당 거래에 배분된 고정비','Total Variable Cost : Landed Cost 등 변동비 총액','Volume : 거래 물량'],
+  example:'(고정비 50,000 + 변동비 5,250,000) / 5,000 MT\n→ Break-even Price = USD 1,060/MT',
+  related:['afclandedcost','afcbepvolume']
+},
+{
+  id:'afcbepvolume', code:'BEP VOLUME', name:'Break-even Volume', cat:'acctcalc',
+  def:'주어진 판매단가에서 고정비를 회수하는 데 필요한 최소 판매물량이다. 계약 협상 시 최소 판매 물량 기준으로 활용된다.',
+  formula:'Break-even Volume = Total Fixed Cost / (Sales Price - Variable Cost per Unit)',
+  components:['Total Fixed Cost : 고정비 총액','Sales Price : 단위 판매단가','Variable Cost per Unit : 단위당 변동비'],
+  example:'50,000 / (1,120 - 1,050)\n→ Break-even Volume = 714 MT',
+  related:['afcbepprice','afccontmargin']
+},
+{
+  id:'afcocf', code:'OCF', name:'Operating Cash Flow (OCF)', cat:'acctcalc',
+  def:'영업활동을 통해 실제로 유입·유출된 현금이다. 재무상태표·현금흐름표에 보고되는 회계상 실적 지표이며, 재고·매출채권 규모가 큰 Trading 업에서는 순이익과 괴리가 크게 발생할 수 있다.',
+  formula:'OCF = Net Income + Depreciation & Amortization - Increase in Working Capital',
+  components:['Net Income : 당기순이익','D&A : 감가상각비·무형자산상각비(비현금성 비용 가산)','Increase in Working Capital : 재고·매출채권 증가분(현금 유출, 차감)'],
+  example:'Net Income USD 217,500 + D&A USD 20,000 - Working Capital 증가 USD 100,000\n→ OCF = USD 137,500',
+  related:['afcnetincome','afcfcf','afcworkingcapital']
+},
+{
+  id:'afcfcf', code:'FCF', name:'Free Cash Flow (FCF)', cat:'acctcalc',
+  def:'OCF에서 설비 등 자본적지출(CAPEX)을 차감한, 배당·차입금 상환·재투자에 쓸 수 있는 잉여현금이다. 실무·경영보고에서 가장 흔히 쓰이는 "일반적 FCF"로, 기업가치 평가용 FCFF·FCFE와는 산출 기준이 다르다는 점에 유의해야 한다.',
+  formula:'FCF = OCF - CAPEX',
+  components:['OCF : 영업활동현금흐름(회계상 실적치)','CAPEX : 자본적지출'],
+  example:'OCF USD 137,500 - CAPEX(탱크 개보수) USD 30,000\n→ FCF = USD 107,500',
+  related:['afcocf','afccapex','afcfcff']
+},
+{
+  id:'afcfcff', code:'FCFF', name:'FCFF', cat:'acctcalc',
+  def:'Free Cash Flow to Firm. 실제 이자·차입 구조와 무관하게(Unlevered) EBIT을 출발점으로 삼아, 채권자와 주주 모두에게 귀속되는 잉여현금을 산출한다. 회계상 보고되는 OCF 기반 FCF와 달리 기업가치(Enterprise Value) DCF 평가에서 WACC로 할인하는 용도로 쓰인다.',
+  formula:'FCFF = EBIT × (1 - Tax Rate) + D&A - CAPEX - Increase in Working Capital',
+  components:['EBIT : 영업이익','Tax Rate : 법인세율','D&A : 감가상각비·무형자산상각비','CAPEX : 자본적지출','Increase in Working Capital : 운전자본 증가분'],
+  example:'EBIT 300,000×(1-25%) + D&A 20,000 - CAPEX 30,000 - WC 증가 100,000\n→ FCFF = USD 115,000',
+  related:['afcfcf','afcfcfe','afcroic']
+},
+{
+  id:'afcfcfe', code:'FCFE', name:'FCFE', cat:'acctcalc',
+  def:'Free Cash Flow to Equity. FCFF에서 세후 이자비용을 차감하고 순차입금 변동을 반영한, 주주에게만 귀속되는 현금흐름이다(Levered). 주식가치 평가나 배당 여력 판단에 쓰이며 Cost of Equity로 할인한다. OCF/FCF/FCFF와 혼동하지 않도록 "채권자 몫을 제외한 최종 주주 귀속분"이라는 점을 기준으로 구분한다.',
+  formula:'FCFE = FCFF - Interest Expense × (1 - Tax Rate) + Net Borrowing',
+  components:['FCFF : 기업잉여현금흐름(Unlevered)','Interest Expense : 이자비용','Net Borrowing : 순차입(신규 차입 - 상환)'],
+  example:'FCFF 115,000 - Interest 20,000×(1-25%)=15,000 + Net Borrowing 0\n→ FCFE = USD 100,000',
+  related:['afcfcff']
+},
+{
+  id:'afccapex', code:'CAPEX', name:'CAPEX', cat:'acctcalc',
+  def:'유형·무형자산 취득에 지출한 투자금액이다. Trading 업에서는 저장탱크·터미널·물류설비 지출이 주를 이루며, 손익계산서가 아닌 현금흐름표·재무상태표에 반영된다.',
+  formula:'CAPEX = Ending PP&E - Beginning PP&E + Depreciation',
+  components:['Ending PP&E / Beginning PP&E : 기말·기초 유형자산 장부가액','Depreciation : 해당 기간 감가상각비'],
+  example:'기말 PP&E 515,000 - 기초 PP&E 500,000 + Depreciation 15,000\n→ CAPEX = USD 30,000',
+  related:['afcfcf','afcfcff']
+},
+{
+  id:'afcworkingcapital', code:'WC', name:'Working Capital', cat:'acctcalc',
+  def:'유동자산에서 유동부채를 차감한 값으로, 단기 영업활동을 운영하는 데 필요한 자금이다. Trading 업은 재고(Inventory)와 매출채권(Accounts Receivable) 비중이 높아 물량·가격이 커질수록 운전자본 부담도 함께 커진다.',
+  formula:'Working Capital = Current Assets - Current Liabilities',
+  components:['Current Assets : 재고자산·매출채권·현금성자산 등','Current Liabilities : 매입채무(Accounts Payable)·단기차입금 등'],
+  example:'Current Assets(재고 800,000 + 매출채권 400,000 + 현금 100,000) 1,300,000\n- Current Liabilities(매입채무) 900,000\n→ Working Capital = USD 400,000',
+  related:['afcocf','afcccc']
+},
+{
+  id:'afcccc', code:'CCC', name:'Cash Conversion Cycle (CCC)', cat:'acctcalc',
+  def:'원재료·상품 매입에 현금을 투입한 시점부터 판매대금을 회수하기까지 걸리는 일수다. 재고 보유기간과 매출채권 회수기간의 합에서 매입채무 지급유예기간을 차감해 산출하며, 짧을수록 자금 회전이 빠르다.',
+  formula:'CCC = DIO + DSO - DPO',
+  components:['DIO(Days Inventory Outstanding) : 재고자산 평균 보유일수','DSO(Days Sales Outstanding) : 매출채권 평균 회수일수','DPO(Days Payable Outstanding) : 매입채무 평균 지급유예일수'],
+  example:'DIO 25일 + DSO 30일 - DPO 20일\n→ CCC = 35일',
+  related:['afcworkingcapital']
+},
+{
+  id:'afcroic', code:'ROIC', name:'ROIC', cat:'acctcalc',
+  def:'Return On Invested Capital. 영업활동에 투입된 자본(차입금+자본) 대비 세후 영업이익(NOPAT)의 비율이다. Trading 사업이 자본비용 이상의 수익을 창출하는지 판단하는 핵심 투자수익성 지표다.',
+  formula:'ROIC = NOPAT / Invested Capital × 100  (NOPAT = EBIT × (1 - Tax Rate))',
+  components:['NOPAT(Net Operating Profit After Tax) : 세후 영업이익','Invested Capital : 순차입금 + 자기자본'],
+  example:'NOPAT = EBIT 300,000×(1-25%) = USD 225,000\nInvested Capital USD 2,500,000\n→ ROIC = 9.0%',
+  related:['afcebit','afcfcff']
 }
 ];
 
@@ -1317,6 +1553,9 @@ function openModal(id){
     <div class="code">${t.code} · ${c.icon} ${c.label}</div>
     <h2>${t.name}</h2>
     <p class="def">${t.def}</p>
+    ${t.formula ? `<div class="calc-label">산식</div><div class="formula">${t.formula}</div>` : ''}
+    ${t.components ? `<div class="calc-label">구성요소</div><ul class="components">${t.components.map(c=>`<li>${c}</li>`).join('')}</ul>` : ''}
+    ${t.example ? `<div class="calc-label">Trading Example</div><div class="example">${t.example}</div>` : ''}
     <div class="rel-label">연관 용어</div>
     <div class="rel-chips">${t.related.map(rid=>{
       const r = byId(rid);
