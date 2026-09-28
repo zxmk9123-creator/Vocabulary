@@ -513,6 +513,168 @@ related:['laytime','demurrage']
 },
 
 {
+id:'voyagecharter',
+code:'VOYAGE CHARTER',
+name:'Voyage Charter',
+cat:'logistics',
+def:'특정 항차의 화물 운송을 기준으로 선박을 용선하는 방식이다.',
+related:['charterparty','timecharter','freight']
+},
+
+{
+id:'timecharter',
+code:'TIME CHARTER',
+name:'Time Charter',
+cat:'logistics',
+def:'일정 기간 동안 선박 자체를 용선하는 방식이다.',
+related:['charterparty','voyagecharter']
+},
+
+{
+id:'voyagedays',
+code:'VOYAGE DAYS',
+name:'Voyage Days',
+cat:'logistics',
+def:'특정 항차에 소요되는 운항 일수를 의미한다.',
+related:['voyagecharter','eta','etd']
+},
+
+{
+id:'laycan',
+code:'LAYCAN',
+name:'Laycan',
+cat:'logistics',
+def:'선박이 선적항에 도착해 화물을 실을 수 있도록 정해진 기간이다.',
+related:['nor','laytime']
+},
+
+{
+id:'shipper',
+code:'SHIPPER',
+name:'Shipper',
+cat:'logistics',
+def:'화물을 실제로 선적하는 자로, B/L상 송하인을 의미한다.',
+related:['consignee','notifyparty','bl']
+},
+
+{
+id:'consignee',
+code:'CONSIGNEE',
+name:'Consignee',
+cat:'logistics',
+def:'운송인이 화물을 인도할 대상자로, B/L상 수하인을 의미한다.',
+related:['shipper','notifyparty','bl']
+},
+
+{
+id:'notifyparty',
+code:'NOTIFY PARTY',
+name:'Notify Party',
+cat:'logistics',
+def:'화물 도착 사실을 통지받는 당사자를 의미한다.',
+related:['shipper','consignee','bl']
+},
+
+{
+id:'loading',
+code:'LOADING',
+name:'Loading',
+cat:'logistics',
+def:'선박 등에 화물을 싣는 작업을 의미한다.',
+related:['discharge','laycan']
+},
+
+{
+id:'shipment',
+code:'SHIPMENT',
+name:'Shipment',
+cat:'trade',
+def:'특정 화물의 실제 선적 또는 그 선적 물량을 의미한다.',
+related:['contractqty','loading']
+},
+
+{
+id:'po',
+code:'PO',
+name:'Purchase Order (구매주문서)',
+cat:'trade',
+def:'구매자가 공급자에게 발행하는 주문서로, 계약 이행의 실행 단위가 된다.',
+related:['contractqty','salescontract','balance']
+},
+
+{
+id:'contractqty',
+code:'CONTRACT QTY',
+name:'Contract Quantity',
+cat:'trade',
+def:'계약상 약정된 구매·판매 물량을 의미한다.',
+related:['po','balance']
+},
+
+{
+id:'balance',
+code:'BALANCE',
+name:'Balance / Remaining Quantity',
+cat:'trade',
+def:'계약 또는 PO에서 아직 선적·인수되지 않은 잔여 물량을 의미한다.',
+related:['contractqty','po','stock']
+},
+
+{
+id:'stock',
+code:'STOCK',
+name:'Stock',
+cat:'trade',
+def:'현재 보유하고 있는 재고 물량으로, 실무에서 Inventory와 유사하게 사용된다.',
+related:['inventory','balance']
+},
+
+{
+id:'pull',
+code:'PULL',
+name:'Pull / Pulling',
+cat:'trade',
+def:'계약·PO 등에 잡혀 있는 물량을 실제 출고·선적·인수하도록 당겨오는 것. 회사별 사용 의미 확인이 필요하다.',
+related:['po','balance']
+},
+
+{
+id:'polishing',
+code:'POLISHING',
+name:'Polishing',
+cat:'trade',
+def:'표준 무역용어라기보다는 회사 내부 표현일 가능성이 높으며, 물량·계약·출하계획 등을 조정·정리한다는 의미로 사용될 수 있다.',
+related:['pull','allocation']
+},
+
+{
+id:'basis',
+code:'BASIS',
+name:'Basis',
+cat:'trade',
+def:'국제 원자재 거래에서 기준가격 대비 특정 지역·품질·조건의 가격 차이를 나타내는 개념이다.',
+related:['premiumdiscount','crushmargin']
+},
+
+{
+id:'premiumdiscount',
+code:'PREMIUM/DISCOUNT',
+name:'Premium / Discount',
+cat:'trade',
+def:'기준가격에 추가되는 가격 프리미엄 또는 차감되는 할인을 의미한다.',
+related:['basis']
+},
+
+{
+id:'crushmargin',
+code:'CRUSH MARGIN',
+name:'Crush Margin',
+cat:'commodity',
+def:'대두·해바라기씨 등 원료를 가공해 얻는 오일·박 등의 판매가치와 원료 투입비용의 차이를 나타내는 가공 마진이다.',
+related:['basis','cpo']
+},
+
+{
 id:'eta',
 code:'ETA',
 name:'Estimated Time of Arrival',
